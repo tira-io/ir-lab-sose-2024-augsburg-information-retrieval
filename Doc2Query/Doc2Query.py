@@ -17,14 +17,19 @@ class Doc2Query:
         self.model = AutoModelForCausalLM.from_pretrained(model_id, load_in_4bit=True)  # Geht das mit Llama auch in 4bit?
 
 
-    def expandDocumentsByQueries(self, pt_dataset):
+    def expandDocumentsByQueries(self, pt_dataset_name):
         '''Expands the documents by queries. Return the extended pyterrier dataset.'''
         # Initialize PyTerrier
-        if not pt.started():
-            pt.init()
+        #if not pt.started():
+        #    pt.init()
+        #pt_dataset_name = 'irds:ir-lab-sose-2024/ir-acl-anthology-20240504-training'
+        pt_dataset = pt.get_dataset(pt_dataset_name)
         text_df = self.getTextDfFromPtDataset(pt_dataset)
         queries = text_df['text'].apply(self.createQueries)
         text_df['text'] = text_df['text'] + ' ' + queries
+        return text_df
+        
+        #TODO: Return pyterrier dataset
 
         # Create a new modifierd pyterrier dataset
         #modified_df = text_df
@@ -58,6 +63,7 @@ class Doc2Query:
     
 
     def createQueries(self, text): 
+        #TODO: Not just one querie but multiple (three)
         '''Promts the LLM to get queries for a given document'''
         prompt = "Generate queries about the following text: " + text
         if self.model_id == "mistralai/Mixtral-8x7B-v0.1": 
