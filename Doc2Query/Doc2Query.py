@@ -26,7 +26,8 @@ class Doc2Query:
         pt_dataset = pt.get_dataset(pt_dataset_name)
         text_df = self.getTextDfFromPtDataset(pt_dataset)
         queries = text_df['text'].apply(self.createQueries)
-        text_df['text'] = text_df['text'] + ' ' + queries
+        #text_df['text'] = text_df['text'] + ' ' + queries
+        text_df['text'] = text_df.apply(lambda row: f"{row['text']} {queries[row.name]}", axis=1)
         return text_df
         
         #TODO: Return pyterrier dataset
