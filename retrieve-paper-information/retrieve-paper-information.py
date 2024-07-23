@@ -3,12 +3,8 @@ import json
 import pandas as pd
 from collections import defaultdict
 import time
-
-from tira.third_party_integrations import ensure_pyterrier_is_loaded, persist_and_normalize_run
-from tira.rest_api_client import Client
-import pyterrier as pt
 import sys
-
+from tqdm import tqdm
 
 
 def retrieve_single_paper_info(title: str) -> dict:
@@ -28,10 +24,27 @@ def retrieve_single_paper_info(title: str) -> dict:
     if result == {'error': 'Title match not found'}:
         return None
     
+    if result == {'message': 'Too Many Requests. Please wait and try again or apply for a key for higher rate limits. https://www.semanticscholar.org/product/api#api-key-form', 'code': '429'}:
+        print("API rate limit exceeded - waiting 60 seconds!!\n")
+        time.sleep(60)
+        return retrieve_single_paper_info(title)
+    
+        # Handle API error
     if not request.ok:
-        raise Exception(f'Request failed: {request.reason}')
-
-    result = result['data'][0] # Extract the paper information
+        print("Request is not ok")
+        print("title: " + title)
+        print("result: ")
+        print(result)
+        return None
+    
+    try:
+        result = result['data'][0] # Extract the paper information
+    except Exception as e:
+        print("Unpacking results failed")
+        print("title: " + title)
+        print("result: ")
+        print(result)
+        return None
 
     return result
     
@@ -43,23 +56,12 @@ def retrieve_multiple_papers_info(documents: pd.DataFrame) -> dict:
     """
     
     docs_with_infos = defaultdict(dict)
-    iteration = 0
 
-    for index, row in documents.iterrows():
+    for index, row in tqdm(documents.iterrows(), total=len(documents), unit="Document"):
         docno = row['docno']
         title = row['text'].split('\n')[0]
 
         docs_with_infos[docno] = retrieve_single_paper_info(title)
-
-        if(docs_with_infos[docno] is not None):
-            print(title)
-            print(docs_with_infos[docno]['title'])
-    
-
-        iteration += 1
-        if iteration % 100 == 0:
-            print(f'Processed {iteration} documents')
-            break
     
     return docs_with_infos
 
@@ -92,11 +94,13 @@ if __name__ == '__main__':
     if len(console_parameters) == 0:
         file_name = 'data/tira_documents.json'
     else:
-        file_name = f'data/splitted_docs/{console_parameters[0]}.json'
-    
+        file_name = f'data/splitted_docs/{console_parameters[0]}'
+
+    print("Started pulling for filename:" + file_name)
+
     with open(file_name, 'r') as file:
         documents = json.load(file)
-    
+
     documents = pd.DataFrame(documents)
 
     start_time = time.time()
@@ -107,7 +111,9 @@ if __name__ == '__main__':
     execution_time = end_time - start_time
     print(f"Execution time: {round(execution_time)} seconds")
 
-    save_papers_info(docs_with_infos, file_name)
+    save_papers_info(docs_with_infos, f'{file_name}_retrieved.json')
+
+    print("finished:" + file_name)
 
     # Get the missing results
     # missing_results = [doc for doc, info in docs_with_infos.items() if info is None]

@@ -11,23 +11,32 @@ def get_splitted_docfiles(directory_path):
         return []
 
 
-def run_script(input_param):
-    result = subprocess.run(['python', 'retrieve-paper-information.py', str(input_param)], capture_output=True, text=True)
-    return result.stdout
+def parallel_execute(input_param):
+    try:
+        result = subprocess.run(['python3', 'retrieve-paper-information/retrieve-paper-information.py', str(input_param)], stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 
+        output = result.stdout.decode('utf-8')
+        print(output)       
+        return result.stdout
+    except subprocess.CalledProcessError as e:
+        return f"Error: {e.stderr}"
 
 
 if __name__ == '__main__':
+    print("started")
     directory_path = "data/splitted_docs/"
     files = get_splitted_docfiles(directory_path)
+    files.sort()
 
-
-
-    with ThreadPoolExecutor() as executor:
-        results = executor.map(run_script, files)
-
-    for result in results:
-        print(result)
+    parallel_api_calls = 1
+    for i in range(0, len(files), parallel_api_calls):
+    
+        with ThreadPoolExecutor() as executor:
+            executor.map(parallel_execute, files[i:i+parallel_api_calls])
+        
+        print(f'Successfully retrieved the documents: {i} to {i+parallel_api_calls-1}')
+    
+    print("completed finally")
 
 
 
