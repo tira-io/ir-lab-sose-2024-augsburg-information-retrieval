@@ -13,8 +13,9 @@ class Doc2Query:
         
         '''
         self.model_id = model_id
-        self.tokenizer = AutoTokenizer.from_pretrained(model_id)
-        self.model = AutoModelForCausalLM.from_pretrained(model_id, load_in_4bit=True)  # Geht das mit Llama auch in 4bit?
+        path = "/hpc/gpfs2/scratch/g/coling/models/"+model_id
+        self.tokenizer = AutoTokenizer.from_pretrained(path)
+        self.model = AutoModelForCausalLM.from_pretrained(path, load_in_4bit=True)  # Geht das mit Llama auch in 4bit?
 
 
     def expandDocumentsByQueries(self, pt_dataset_name):
