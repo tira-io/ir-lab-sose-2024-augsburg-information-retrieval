@@ -1,1 +1,5 @@
 .tira
+data
+pagerank/fake_input*
+pagerank/test_input.json
+pagerank/reference_matrix.json
