@@ -1,68 +1,68 @@
-{"query_id": "1", "query": "retrieval system improving effectiveness", "llm_expansion": "search engine, retrieval, system"}
-{"query_id": "2", "query": "machine learning language identification", "llm_expansion": "machine learning language identification"}
+{"query_id": "1", "query": "retrieval system improving effectiveness", "llm_expansion": "effectiveness improve system"}
+{"query_id": "2", "query": "machine learning language identification", "llm_expansion": "machine learning identification language"}
 {"query_id": "3", "query": "social media detect self harm", "llm_expansion": "social media detect self harm"}
-{"query_id": "4", "query": "stemming for arabic languages", "llm_expansion": "arabic languages"}
-{"query_id": "5", "query": "audio based animal recognition", "llm_expansion": "animal recognition, audio"}
-{"query_id": "6", "query": "comparison different retrieval models", "llm_expansion": "comparison different retrieval models"}
-{"query_id": "7", "query": "cache architecture", "llm_expansion": "architecture cache"}
+{"query_id": "4", "query": "stemming for arabic languages", "llm_expansion": "arabic language stemming"}
+{"query_id": "5", "query": "audio based animal recognition", "llm_expansion": "animal recognition audio based"}
+{"query_id": "6", "query": "comparison different retrieval models", "llm_expansion": "model comparison model"}
+{"query_id": "7", "query": "cache architecture", "llm_expansion": "cache architecture"}
 {"query_id": "8", "query": "document scoping formula", "llm_expansion": "document scoping formula"}
-{"query_id": "9", "query": "pseudo relevance feedback", "llm_expansion": "pseudo relevance feedback"}
-{"query_id": "10", "query": "how to represent natural conversations in word nets", "llm_expansion": "natural conversations word nets"}
-{"query_id": "11", "query": "algorithm acceleration with nvidia cuda", "llm_expansion": "algorithm, cuda, acceleration"}
-{"query_id": "12", "query": "mention of algorithm", "llm_expansion": "algorithm mention"}
-{"query_id": "13", "query": "at least three authors", "llm_expansion": "author, author, author"}
-{"query_id": "14", "query": "german domain", "llm_expansion": "german domain"}
-{"query_id": "15", "query": "mention of open source", "llm_expansion": "open source software"}
-{"query_id": "16", "query": "inclusion of text mining", "llm_expansion": "inclusion of text mining"}
-{"query_id": "17", "query": "the ethics of artificial intelligence", "llm_expansion": "artificial intelligence ethics"}
-{"query_id": "19", "query": "machine learning for more relevant results", "llm_expansion": "machine learning for more relevant results"}
-{"query_id": "20", "query": "crawling websites using machine learning", "llm_expansion": "crawling websites using machine learning"}
-{"query_id": "21", "query": "recommenders influence on users", "llm_expansion": "influence on users"}
-{"query_id": "22", "query": "search engine caching effects", "llm_expansion": "caching effects, search engine, caching"}
-{"query_id": "23", "query": "consumer product reviews", "llm_expansion": "consumer product reviews"}
-{"query_id": "24", "query": "limitations machine learning", "llm_expansion": "machine learning limitations"}
-{"query_id": "25", "query": "medicine related research", "llm_expansion": "medicine research"}
+{"query_id": "9", "query": "pseudo relevance feedback", "llm_expansion": "follow pseudo relevance feedback"}
+{"query_id": "10", "query": "how to represent natural conversations in word nets", "llm_expansion": "nets represent conversation"}
+{"query_id": "11", "query": "algorithm acceleration with nvidia cuda", "llm_expansion": "acceleration cuda"}
+{"query_id": "12", "query": "mention of algorithm", "llm_expansion": "algorithm mention mention"}
+{"query_id": "13", "query": "at least three authors", "llm_expansion": "authors author list"}
+{"query_id": "14", "query": "german domain", "llm_expansion": "german domain name"}
+{"query_id": "15", "query": "mention of open source", "llm_expansion": "open source mention"}
+{"query_id": "16", "query": "inclusion of text mining", "llm_expansion": "include text mining"}
+{"query_id": "17", "query": "the ethics of artificial intelligence", "llm_expansion": "ethics of artificial intelligence"}
+{"query_id": "19", "query": "machine learning for more relevant results", "llm_expansion": "machine learning result"}
+{"query_id": "20", "query": "crawling websites using machine learning", "llm_expansion": "list of websites that are crawled using machine learning"}
+{"query_id": "21", "query": "recommenders influence on users", "llm_expansion": "recommender influence user"}
+{"query_id": "22", "query": "search engine caching effects", "llm_expansion": "caching effect search engine"}
+{"query_id": "23", "query": "consumer product reviews", "llm_expansion": "consumer product review"}
+{"query_id": "24", "query": "limitations machine learning", "llm_expansion": "limitations machine learning"}
+{"query_id": "25", "query": "medicine related research", "llm_expansion": "medicine related research"}
 {"query_id": "26", "query": "natural language processing", "llm_expansion": "natural language processing"}
-{"query_id": "27", "query": "graph based ranking", "llm_expansion": "graph based ranking"}
-{"query_id": "28", "query": "medical studies that use information retrieval", "llm_expansion": "medical studies, information retrieval"}
-{"query_id": "29", "query": "information retrieval on different language sources", "llm_expansion": "information retrieval on different language sources"}
-{"query_id": "30", "query": "papers that compare multiple information retrieval methods", "llm_expansion": "keywords: comparison, information retrieval, methods"}
-{"query_id": "31", "query": "risks of information retrieval in social media", "llm_expansion": "information retrieval, social media"}
-{"query_id": "32", "query": "actual experiments that strengthen theoretical knowledge", "llm_expansion": "actual experiments strengthen theoretical knowledge"}
-{"query_id": "33", "query": "fake news detection", "llm_expansion": "fake news detection"}
+{"query_id": "27", "query": "graph based ranking", "llm_expansion": "ranking graph based"}
+{"query_id": "28", "query": "medical studies that use information retrieval", "llm_expansion": "information retrieval medical study"}
+{"query_id": "29", "query": "information retrieval on different language sources", "llm_expansion": "information retrieval language source"}
+{"query_id": "30", "query": "papers that compare multiple information retrieval methods", "llm_expansion": "data retrieval paper compare"}
+{"query_id": "31", "query": "risks of information retrieval in social media", "llm_expansion": "information retrieval social media"}
+{"query_id": "32", "query": "actual experiments that strengthen theoretical knowledge", "llm_expansion": "experiment knowledge"}
+{"query_id": "33", "query": "fake news detection", "llm_expansion": "news detection fake"}
 {"query_id": "34", "query": "multimedia retrieval", "llm_expansion": "multimedia retrieval"}
-{"query_id": "35", "query": "processing natural language for information retrieval", "llm_expansion": "processing natural language for information retrieval"}
-{"query_id": "36", "query": "recommendation systems", "llm_expansion": "recommendation system"}
-{"query_id": "37", "query": "personalised search in e commerce", "llm_expansion": "personalised search in e commerce"}
-{"query_id": "38", "query": "sentiment analysis", "llm_expansion": "sentiment analysis, sentiment"}
-{"query_id": "39", "query": "informational retrieval using neural networks", "llm_expansion": "informational retrieval neural networks"}
+{"query_id": "35", "query": "processing natural language for information retrieval", "llm_expansion": "information retrieval language"}
+{"query_id": "36", "query": "recommendation systems", "llm_expansion": "system recommendation system"}
+{"query_id": "37", "query": "personalised search in e commerce", "llm_expansion": "e commerce personalised search"}
+{"query_id": "38", "query": "sentiment analysis", "llm_expansion": "analysis sentiment analysis"}
+{"query_id": "39", "query": "informational retrieval using neural networks", "llm_expansion": "informational retrieval network"}
 {"query_id": "40", "query": "query log analysis", "llm_expansion": "query log analysis"}
-{"query_id": "41", "query": "entity recognition", "llm_expansion": "entity recognition"}
-{"query_id": "42", "query": "relevance assessments", "llm_expansion": "relevance assessments assessment"}
-{"query_id": "43", "query": "deep neural networks", "llm_expansion": "deep neural networks"}
-{"query_id": "44", "query": "information retrieval", "llm_expansion": "information retrieval information retrieval"}
-{"query_id": "45", "query": "analysis for android apps", "llm_expansion": "android apps analysis"}
-{"query_id": "46", "query": "the university of amsterdam", "llm_expansion": "university of amsterdam"}
-{"query_id": "47", "query": "neural ranking for ecommerce product search", "llm_expansion": "ecommerce product search neural ranking"}
-{"query_id": "48", "query": "web pages evolution", "llm_expansion": "evolution of web pages"}
-{"query_id": "49", "query": "exhaustivity of index", "llm_expansion": "index, exhaustion, index"}
-{"query_id": "50", "query": "query optimization", "llm_expansion": "search optimization"}
-{"query_id": "51", "query": "cosine similarity vector", "llm_expansion": "cosine similarity vector"}
-{"query_id": "52", "query": "reverse indexing", "llm_expansion": "reverse indexing"}
-{"query_id": "53", "query": "index compression techniques", "llm_expansion": "index compression techniques"}
-{"query_id": "54", "query": "search engine optimization with query logs", "llm_expansion": "search engine optimization query logs"}
+{"query_id": "41", "query": "entity recognition", "llm_expansion": "recognition entity recognition"}
+{"query_id": "42", "query": "relevance assessments", "llm_expansion": "relevance assessment"}
+{"query_id": "43", "query": "deep neural networks", "llm_expansion": "network deep neural network"}
+{"query_id": "44", "query": "information retrieval", "llm_expansion": "information retrieval"}
+{"query_id": "45", "query": "analysis for android apps", "llm_expansion": "analysis app"}
+{"query_id": "46", "query": "the university of amsterdam", "llm_expansion": "university of amsterdam university"}
+{"query_id": "47", "query": "neural ranking for ecommerce product search", "llm_expansion": "search product category"}
+{"query_id": "48", "query": "web pages evolution", "llm_expansion": "web page evolution"}
+{"query_id": "49", "query": "exhaustivity of index", "llm_expansion": "index index exhaustivity"}
+{"query_id": "50", "query": "query optimization", "llm_expansion": "optimization query optimization"}
+{"query_id": "51", "query": "cosine similarity vector", "llm_expansion": "vector cosine similarity vector"}
+{"query_id": "52", "query": "reverse indexing", "llm_expansion": "indexing reverse indexing"}
+{"query_id": "53", "query": "index compression techniques", "llm_expansion": "index compression technique"}
+{"query_id": "54", "query": "search engine optimization with query logs", "llm_expansion": "search engine optimization query log"}
 {"query_id": "55", "query": "bm25", "llm_expansion": "bm25 bm25"}
-{"query_id": "56", "query": "what makes natural language processing natural", "llm_expansion": "natural language processing"}
-{"query_id": "57", "query": "principle of a information retrieval indexing", "llm_expansion": "information retrieval indexing"}
+{"query_id": "56", "query": "what makes natural language processing natural", "llm_expansion": "language processing natural"}
+{"query_id": "57", "query": "principle of a information retrieval indexing", "llm_expansion": "information retrieval principle"}
 {"query_id": "58", "query": "architecture of web search engine", "llm_expansion": "architecture of web search engine"}
-{"query_id": "59", "query": "what is ahp", "llm_expansion": "ahp abbreviation"}
-{"query_id": "60", "query": "what is information retrieval", "llm_expansion": "information retrieval information retrieval"}
-{"query_id": "61", "query": "efficient retrieval algorithms", "llm_expansion": "algorithm, efficient, algorithm"}
-{"query_id": "62", "query": "how to avoid spam results", "llm_expansion": "avoid spam results"}
-{"query_id": "63", "query": "information retrieval with algorithms", "llm_expansion": "information retrieval algorithms"}
-{"query_id": "64", "query": "misspellings in queries", "llm_expansion": "search query misspelling"}
-{"query_id": "65", "query": "information in different language", "llm_expansion": "information in different language"}
-{"query_id": "66", "query": "abbreviations in queries", "llm_expansion": "abbreviations in queries"}
-{"query_id": "67", "query": "lemmatization algorithms", "llm_expansion": "algorithm, lemmatization, algorithm"}
-{"query_id": "68", "query": "filter ad rich documents", "llm_expansion": "filter ad rich documents"}
-{"query_id": "18", "query": "advancements in information retrieval", "llm_expansion": "advancements in information retrieval"}
+{"query_id": "59", "query": "what is ahp", "llm_expansion": "ahp ahp"}
+{"query_id": "60", "query": "what is information retrieval", "llm_expansion": "information retrieval information"}
+{"query_id": "61", "query": "efficient retrieval algorithms", "llm_expansion": "algorithm for retrieval"}
+{"query_id": "62", "query": "how to avoid spam results", "llm_expansion": "spam result spam"}
+{"query_id": "63", "query": "information retrieval with algorithms", "llm_expansion": "algorithm retrieve information"}
+{"query_id": "64", "query": "misspellings in queries", "llm_expansion": "query misspellings"}
+{"query_id": "65", "query": "information in different language", "llm_expansion": "information language"}
+{"query_id": "66", "query": "abbreviations in queries", "llm_expansion": "abbreviation query query"}
+{"query_id": "67", "query": "lemmatization algorithms", "llm_expansion": "lemmatization algorithm"}
+{"query_id": "68", "query": "filter ad rich documents", "llm_expansion": "filter document ad"}
+{"query_id": "18", "query": "advancements in information retrieval", "llm_expansion": "information retrieval advancement"}

@@ -18,31 +18,22 @@ pt_dataset = pt.get_dataset('irds:ir-lab-sose-2024/ir-acl-anthology-20240504-tra
 index = tira.pt.index('ir-lab-sose-2024/tira-ir-starter/Index (tira-ir-starter-pyterrier)', pt_dataset)
 
 # Load the model and tokenizer
-model = AutoModelForSeq2SeqLM.from_pretrained("google/flan-t5-large")
-tokenizer = AutoTokenizer.from_pretrained("google/flan-t5-large")
+model = AutoModelForSeq2SeqLM.from_pretrained("google/flan-t5-small")
+tokenizer = AutoTokenizer.from_pretrained("google/flan-t5-small")
 
 def generate_expansion(query):
-    prompt = (
-        "Given the query: '{query}', generate a comprehensive list of keywords that cover the topic. "
-        "Include at least 10 keywords or phrases such as synonyms, abbreviations, and related terms. "
-        "Ensure the keywords are relevant and useful for improving search or information retrieval. "
-        "Format the result as a comma-separated list."
-    )
-    inputs = tokenizer(prompt.format(query=query), return_tensors="pt")
-    outputs = model.generate(**inputs)
+    prompt = f"Write a list of keywords for the given query: {query}"
+    inputs = tokenizer(prompt, return_tensors="pt")
+    outputs = model.generate(**inputs, max_new_tokens=50)
     expanded_query = tokenizer.batch_decode(outputs, skip_special_tokens=True)[0]
     return expanded_query
 
-# Initialize the TIRA client and PyTerrier dataset
-tira = Client()
-pt_dataset = pt.get_dataset('irds:ir-lab-sose-2024/ir-acl-anthology-20240504-training')
-
-# Example: assuming topics are in a DataFrame
-topics_df = pt_dataset.get_topics('text')
+# Get the queries
+queries = pt_dataset.get_topics('text')
 
 # Generate expansions
 expanded_queries = []
-for index, row in topics_df.iterrows():
+for index, row in queries.iterrows():
     expanded_query = generate_expansion(row['query'])
     expanded_queries.append({"query_id": row['qid'], "query": row['query'], "llm_expansion": expanded_query})
 
