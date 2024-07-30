@@ -6,16 +6,17 @@ import pyterrier as pt
 
 class Doc2Query: 
 
-    def __init__(self, model_id):
+    def __init__(self, model_id, temperatur):
         '''
         Initialize the Doc2Query class and load the tokenizer and the LLM. 
-        Model ids might be "mistralai/Mixtral-8x7B-v0.1" or "meta-llama/Llama-2-7b-chat-hf"
+        Model ids might be "mistralai/Mixtral-8x7B-v0.1" or "meta-llama/Llama-2-7b-chat-hf" or "gpt2
         
         '''
         self.model_id = model_id
         #path = "/hpc/gpfs2/scratch/g/coling/models/"+model_id
         self.tokenizer = AutoTokenizer.from_pretrained(model_id)
         self.model = AutoModelForCausalLM.from_pretrained(model_id)  # , load_in_4bit=True # Geht das mit Llama auch in 4bit?
+        self.temperatur = temperatur
 
 
     def expandDocumentsByQueries(self, pt_dataset_name):
@@ -64,25 +65,36 @@ class Doc2Query:
         return df
     
 
-    def createQueries(self, text): 
+    def createQueries(self, input_text): 
         #TODO: Not just one querie but multiple (three)
         '''Promts the LLM to get queries for a given document'''
-        prompt = "Generate queries about the following text: " + text
+        # Define the input text and the prompt for query generation
+        prompt = f"Generate three queries based on the following text:\n\n{input_text}\n\nQuery 1:\nQuery 2:\nQuery 3:"
+
         if self.model_id == "mistralai/Mixtral-8x7B-v0.1": 
             # Encode the prompt and generate text
             inputs = self.tokenizer(prompt, return_tensors="pt").to(0)
             outputs = self.model.generate(**inputs, max_new_tokens=20)
             # Decode the generated text
             queries = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
-        elif self.model_name == "meta-llama/Llama-2-7b-chat-hf": 
+        elif self.model_id == "meta-llama/Llama-2-7b-chat-hf": 
             # Encode the prompt and generate text
             inputs = self.tokenizer(prompt, return_tensors="pt")
             outputs = self.model.generate(inputs["input_ids"], max_length=100)
             # Decode the generated text
             queries = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+        elif self.model_id == "gpt2": 
+            # Encode the prompt and generate text
+            inputs = self.tokenizer.encode(prompt, return_tensors="pt")
+            outputs = self.model.generate(inputs, max_length=100, num_return_sequences=1, do_sample=True, temperature=self.temperatur)
+
+            # Decode the generated text
+            queries = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
+
         else:
             queries = None
-            print("Method not specified for this model. Please check model id.")
+            print("Method not specified for this model. Please check model id. Best regards, Georg")
 
         return queries
 
