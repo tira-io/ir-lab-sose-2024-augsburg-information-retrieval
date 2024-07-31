@@ -1,7 +1,6 @@
 from tira.third_party_integrations import ir_datasets
 import re
 import json
-import os
 
 def load_data():
     dataset = ir_datasets.load('ir-lab-sose-2024/ir-acl-anthology-20240504-training')
