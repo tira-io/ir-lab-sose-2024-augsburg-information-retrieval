@@ -15,7 +15,7 @@ def format_prompt(examples, query):
     return prompt
 
 def generate_expansion(query, model, tokenizer, query_doc_dict, unique_queries, num_samples=3):
-    # Randomly select 4 unique query_texts
+    # Randomly select num_samples unique query_texts
     selected_queries = random.sample(unique_queries, num_samples)
     # For each selected query_text, randomly choose one document
     selected_entries = []
@@ -34,7 +34,7 @@ def generate_expansion(query, model, tokenizer, query_doc_dict, unique_queries, 
     prompt = format_prompt(selected_entries, query)
 
     # Tokenize the prompt
-    inputs = tokenizer(prompt, return_tensors="pt")
+    inputs = tokenizer(prompt, return_tensors="pt", padding=True)
 
     # Generate the expanded query
     outputs = model.generate(**inputs, max_new_tokens=200)
