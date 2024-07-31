@@ -2,12 +2,14 @@
 from tira.third_party_integrations import persist_and_normalize_run, ir_datasets
 from tira.rest_api_client import Client
 import json
+import torch
 import random
 from tqdm import tqdm
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 import pandas as pd
 import click
 
+device = "cuda" if torch.cuda.is_available() else "cpu"
 
 def q2d_few_shot_prompt(query, examples):
     prompt = "Write a passage that answers the given query:\n\n"
@@ -79,7 +81,7 @@ def generate_expansion(query, model, tokenizer, query_doc_dict, unique_queries, 
     prompt = q2d_few_shot_prompt(query, selected_entries)
 
     # Tokenize the prompt
-    inputs = tokenizer(prompt, return_tensors="pt", padding=True)
+    inputs = tokenizer(prompt, return_tensors="pt", padding=True).to(device)
 
     # Generate the expanded query
     outputs = model.generate(**inputs, max_new_tokens=200)
@@ -107,7 +109,7 @@ def main(input_dataset, transformer_model, seed, output_dir):
     dataset = ir_datasets.load(input_dataset)
 
     # Load the model and tokenizer
-    model = AutoModelForSeq2SeqLM.from_pretrained(transformer_model)
+    model = AutoModelForSeq2SeqLM.from_pretrained(transformer_model).to(device)
     tokenizer = AutoTokenizer.from_pretrained(transformer_model)
 
     # Generate expansions
