@@ -15,7 +15,7 @@ def q2d_few_shot_prompt(query, examples):
     prompt = "Write a passage that answers the given query:\n\n"
     for example in examples:
         prompt += f"Query: {example['query_text']}\n"
-        prompt += f"Passage: {example['doc_text']}\n\n"
+        prompt += f"Passage: {example['doc_text'][:1000]}\n\n"
     prompt += f"Query: {query}\nPassage: "
     return prompt
 
@@ -98,7 +98,7 @@ def save_expanded_queries(expanded_queries, file_path):
 @click.option('--seed', default=42, help='The seed for selecting random documents for the context.')
 @click.option('--transformer-model', default='google/flan-t5-small', help='The transformer model to use.')
 @click.option('--output-dir', default='query-expansion/fs-qe-expansions/', help='The output directory.')
-def main(input_dataset, transformer_model, seed, output_dir):
+def main(input_dataset, transformer_model, seed, output_dir, load_in_8bit=False):
     with open('query-expansion/query_doc_dict.json', 'r') as file:
         query_doc_dict = json.load(file)
 
@@ -109,7 +109,7 @@ def main(input_dataset, transformer_model, seed, output_dir):
     dataset = ir_datasets.load(input_dataset)
 
     # Load the model and tokenizer
-    model = AutoModelForSeq2SeqLM.from_pretrained(transformer_model).to(device)
+    model = AutoModelForSeq2SeqLM.from_pretrained(transformer_model, load_in_8bit=load_in_8bit)
     tokenizer = AutoTokenizer.from_pretrained(transformer_model)
 
     # Generate expansions
