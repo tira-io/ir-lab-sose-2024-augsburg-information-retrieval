@@ -1,6 +1,7 @@
 import json
 import networkx as nx
 import matplotlib.pyplot as plt
+from collections import defaultdict
 
 
 class PageRank:
@@ -21,27 +22,57 @@ class PageRank:
     def draw_graph(G: nx.graph) -> None:
         nx.draw_circular(G, node_size=400, with_labels=True)
 
-    def save_pagerank_matrix(pagerank_matrix: dict, filename: str) -> None:
+    def save_pageranks(pageranks: dict, filename: str) -> None:
         """
-        Expects a dictionary with the pagerank matrix and a filename.
-        Saves the pagerank matrix as a JSON file.
+        Expects a dictionary with the pageranks and a filename.
+        Saves the pageranks as a JSON file.
         """
         with open(filename, 'w') as file:
-            json.dump(pagerank_matrix, file)
+            json.dump(pageranks, file)
+
+    def calculate_pageranks(reference_matrix: dict) -> dict:
+        """
+        Expects a reference matrix.
+        Calculates the pageranks.
+        Returns the pageranks.
+        """
+        G = nx.DiGraph(reference_matrix)
+        pr = nx.pagerank(G, alpha=0.85)
+
+        print("Number of edges: ", G.number_of_edges())
+        print("Number of nodes: ", G.number_of_nodes())
+        
+        return pr
 
 
 if __name__ == '__main__':
-    filename = "pagerank/reference_matrix.json"
-    reference_matrix = PageRank.load_reference_matrix(filename)
 
-    G = nx.Graph(reference_matrix)
+    ########## Create the reference matrix ##########
+
+    # Load the papers info
+    with open("data/tira_documents_retrieved.json", 'r') as file:
+        papers_info = json.load(file)
+
+    reference_matrix = defaultdict(dict)
+    for doc, info in papers_info.items():
+        if info is not None:
+            for reference in info['references']:
+                reference_matrix[info['paperId']][reference['paperId']] = 1
+
+    # Save the reference matrix
+    reference_matrix = PageRank.load_reference_matrix("pagerank/reference_matrix.json")
+    
+
+    ########## Create the pagerank matrix ##########
+
+    # Load the reference matrix
+    with open("pagerank/reference_matrix.json", 'r') as file:
+        reference_matrix = json.load(file)
     
     # PageRank.draw_graph(G)
     # plt.savefig("pagerank/weighted_graph.png")
 
-    pr = nx.pagerank(G, alpha=0.85)
+    pr = PageRank.calculate_pageranks(reference_matrix)
+    PageRank.save_pageranks(pr, "pagerank/pageranks.json")
 
-    PageRank.save_pagerank_matrix(pr, "pagerank/pagerank_matrix.json")
-
-    print("Number of edges: ", G.number_of_edges())
-    print("Number of nodes: ", G.number_of_nodes())
+    print("Successfully calculated the pageranks.")
