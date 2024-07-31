@@ -6,7 +6,8 @@ RUN pip3 uninstall -y tira \
 	&& pip3 install tira
 
 RUN pip3 install torch \
-	&& pip3 install transformers
+	&& pip3 install transformers \
+	&& pip3 install colbert
 
 ADD . /app
 
