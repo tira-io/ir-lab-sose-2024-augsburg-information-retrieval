@@ -237,5 +237,4 @@ def main(input_dataset, transformer_model, prompting_type, seed, output_dir, loa
 
 if __name__ == "__main__":
     # prompting_type = q2d_fs, q2d_fs_msmarco, q2d_zs, q2d_prf, q2e_fs, q2e_zs, q2e_prf, cot, cot_prf
-    for type in VALID_PROMPTING_TYPES:
-        main(prompting_type=type)
+    main()
