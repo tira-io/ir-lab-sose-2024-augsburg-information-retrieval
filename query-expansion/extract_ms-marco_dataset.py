@@ -26,8 +26,8 @@ def process_entries(dataset):
         # Check if a relevant passage was found
         if first_relevant_passage is not None:
             saved_queries_and_passages.append({
-                "query": entry['query'],
-                "passage": first_relevant_passage
+                "query_text": entry['query'],
+                "doc_text": first_relevant_passage
             })
     
     # Save the results to a JSON file
