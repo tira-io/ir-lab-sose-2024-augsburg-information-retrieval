@@ -6,7 +6,7 @@ import pyterrier as pt
 
 class Doc2Query: 
 
-    def __init__(self, model_id, temperatur, promting_technique):
+    def __init__(self, model_id, temperature, promting_technique):
         '''
         Initialize the Doc2Query class and load the tokenizer and the LLM. 
         Model ids might be "mistralai/Mixtral-8x7B-v0.1" or "meta-llama/Llama-2-7b-chat-hf" or "gpt2" or "google/flan-t5-small"
@@ -19,14 +19,14 @@ class Doc2Query:
         else: 
             self.tokenizer = AutoTokenizer.from_pretrained(model_id)
             self.model = AutoModelForCausalLM.from_pretrained(model_id)  # , load_in_4bit=True 
-        self.temperatur = temperatur
+        self.temperature = temperature
         self.promting_technique = promting_technique
 
 
     def expandDocumentsByQueries(self, documents_df):
         '''Expands the documents by queries. Return the extended pyterrier dataset.'''
         # Next line is just for testing
-        documents_df = documents_df.head(50)
+        #documents_df = documents_df.head(50)
         queries = documents_df['text'].apply(self.createQueries)
         expaneded_documents_df = documents_df.copy()
         expaneded_documents_df['text'] = documents_df.apply(lambda row: f"{row['text']} {queries[row.name]}", axis=1)
@@ -54,27 +54,27 @@ class Doc2Query:
         if self.model_id == "mistralai/Mixtral-8x7B-v0.1": 
             # Encode the prompt and generate text
             inputs = self.tokenizer(prompt, return_tensors="pt").to(0)
-            outputs = self.model.generate(**inputs, max_new_tokens=20)
+            outputs = self.model.generate(**inputs, max_new_tokens=100, do_sample=True, temperature=self.temperature)
             # Decode the generated text
             queries = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
         elif self.model_id == "meta-llama/Llama-2-7b-chat-hf": 
             # Encode the prompt and generate text
             inputs = self.tokenizer(prompt, return_tensors="pt")
-            outputs = self.model.generate(inputs["input_ids"], max_length=100)
+            outputs = self.model.generate(inputs["input_ids"], max_new_tokens=100, do_sample=True, temperature=self.temperature)
             # Decode the generated text
             queries = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
 
         elif self.model_id == "gpt2": 
             # Encode the prompt and generate text
             inputs = self.tokenizer.encode(prompt, return_tensors="pt")
-            outputs = self.model.generate(inputs, max_length=100, num_return_sequences=1, do_sample=True, temperature=self.temperatur)
+            outputs = self.model.generate(inputs, max_new_tokens=100, num_return_sequences=1, do_sample=True, temperature=self.temperature, pad_token_id=tokenizer.eos_token_id)
             # Decode the generated text
             queries = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
             
         elif self.model_id == "google/flan-t5-small": 
             # Encode the prompt and generate text
-            inputs = self.tokenizer(prompt, return_tensors="pt")
-            outputs = self.model.generate(**inputs)
+            inputs = self.tokenizer(prompt, return_tensors="pt", truncation=True)
+            outputs = self.model.generate(**inputs, max_new_tokens=100, do_sample=True, temperature=self.temperature)
             # Decode the generated text
             queries = self.tokenizer.batch_decode(outputs, skip_special_tokens=True)
         else:
@@ -84,7 +84,7 @@ class Doc2Query:
         return queries
 
 
-    def getPromt(self, input_text): 
+    def getPrompt(self, input_text): 
         if self.promting_technique == "Zero-Shot": 
             prompt = self.getZeroShotPrompt(input_text)
         elif self.promting_technique == "One-Shot": 
