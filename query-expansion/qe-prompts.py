@@ -220,12 +220,13 @@ def main(input_dataset, transformer_model, prompting_type, seed, output_dir, loa
         index = tira.pt.index('ir-lab-sose-2024/tira-ir-starter/Index (tira-ir-starter-pyterrier)', pt_dataset)
         ####
         docs_store = dataset.docs_store()
-        examples = retrieve_prf_documents(query, index, docs_store)
         unique_queries = None
 
     # Generate expansions
     expanded_queries = []
     for query in tqdm(list(dataset.queries_iter())):
+        if prompting_type in ("q2d_prf", "q2e_prf", "cot_prf"):
+            examples = retrieve_prf_documents(query.default_text(), index, docs_store)
         input_prompt, expanded_query = generate_expansion(query.default_text(), model, tokenizer, prompting_type, examples, unique_queries)
         expanded_queries.append({"query_id": query.query_id, "query":query.default_text(), "llm_expansion": expanded_query, 'llm_prompt': input_prompt})
     

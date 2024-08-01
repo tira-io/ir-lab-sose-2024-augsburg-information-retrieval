@@ -173,13 +173,6 @@ def save_expanded_queries(expanded_queries, file_path):
     print(f"Expanded queries saved to {file_path}")
 
 
-
-@click.command()
-@click.option('--prompting-type', default='q2d_fs', help='The type of prompting to use.')
-@click.option('--input-dataset', default='ir-lab-sose-2024/ir-acl-anthology-20240504-training', help='The dataset to process.')
-@click.option('--seed', default=42, help='The seed for selecting random documents for the context.')
-@click.option('--transformer-model', default='google/flan-t5-small', help='The transformer model to use.')
-@click.option('--output-dir', default='query-expansion/llm-qe/', help='The output directory.')
 def main(input_dataset, transformer_model, prompting_type, seed, output_dir, load_in_8bit=False):
 
     # Validate prompting type
@@ -220,12 +213,13 @@ def main(input_dataset, transformer_model, prompting_type, seed, output_dir, loa
         index = tira.pt.index('ir-lab-sose-2024/tira-ir-starter/Index (tira-ir-starter-pyterrier)', pt_dataset)
         ####
         docs_store = dataset.docs_store()
-        examples = retrieve_prf_documents(query, index, docs_store)
         unique_queries = None
 
     # Generate expansions
     expanded_queries = []
     query = next(dataset.queries_iter())
+    if prompting_type in ("q2d_prf", "q2e_prf", "cot_prf"):
+        examples = retrieve_prf_documents(query.default_text(), index, docs_store)
     input_prompt, expanded_query = generate_expansion(query.default_text(), model, tokenizer, prompting_type, examples, unique_queries)
     print("#############################################################")
     print(f"Prompt Type: {prompting_type}")
@@ -236,5 +230,14 @@ def main(input_dataset, transformer_model, prompting_type, seed, output_dir, loa
     print("#############################################################")
 
 if __name__ == "__main__":
+
     # prompting_type = q2d_fs, q2d_fs_msmarco, q2d_zs, q2d_prf, q2e_fs, q2e_zs, q2e_prf, cot, cot_prf
-    main()
+    input_dataset = 'ir-lab-sose-2024/ir-acl-anthology-20240504-training'
+    transformer_model = 'google/flan-t5-small'
+    seed = 42
+    output_dir = 'query-expansion/llm-qe/'
+
+    for type in VALID_PROMPTING_TYPES:
+        prompting_type = type
+        print("prompting_type: ", prompting_type)    
+        main(input_dataset, transformer_model, prompting_type, seed, output_dir, load_in_8bit=False)
