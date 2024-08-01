@@ -7,7 +7,8 @@ RUN pip3 uninstall -y tira \
 
 RUN pip3 install torch \
 	&& pip3 install transformers \
-	&& pip3 install datasets 
+	&& pip3 install datasets \
+	&& pip3 install click
 
 ADD . /app
 
