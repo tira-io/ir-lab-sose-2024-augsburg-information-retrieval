@@ -24,36 +24,16 @@ class Doc2Query:
 
     def expandDocumentsByQueries(self, pt_dataset_name):
         '''Expands the documents by queries. Return the extended pyterrier dataset.'''
-        # Initialize PyTerrier
-        #if not pt.started():
-        #    pt.init()
-        #pt_dataset_name = 'irds:ir-lab-sose-2024/ir-acl-anthology-20240504-training'
         pt_dataset = pt.get_dataset(pt_dataset_name)
         text_df = self.getTextDfFromPtDataset(pt_dataset)
+        # Just for testing
+        #text_df = text_df.head()
         queries = text_df['text'].apply(self.createQueries)
-        #text_df['text'] = text_df['text'] + ' ' + queries
         text_df['text'] = text_df.apply(lambda row: f"{row['text']} {queries[row.name]}", axis=1)
         return text_df
         
-        #TODO: Return pyterrier dataset
-
-        # Create a new modifierd pyterrier dataset
-        #modified_df = text_df
-        # Define a custom dataset class
-        #class CustomModifiedDataset(pt.Dataset):
-           # def __init__(self, documents_df):
-                #self.documents_df = documents_df
-
-            #def get_corpus_iter(self):
-                # Yield each modified document as a dictionary
-                #for index, row in self.documents_df.iterrows():
-                    #yield {'docno': row['docno'], 'text': row['text']}
-
-        # Return the custom dataset instance
-        #return CustomModifiedDataset(modified_df)
         
-        
-
+    
     def getTextDfFromPtDataset(self, pt_dataset): 
         '''Given a pyterrier dataset, the texts and document numbers get extracted into a dataframe, which gets returned'''
          # Get the documents generator
@@ -61,15 +41,12 @@ class Doc2Query:
         # Extract docno and text into a DataFrame
         doc_list = []
         for doc in documents:
-            docno = doc['docno']
-            text = doc['text']
-            doc_list.append({'docno': docno, 'text': text})
+            doc_list.append(doc)
         df = pd.DataFrame(doc_list)
         return df
     
 
     def createQueries(self, input_text): 
-        #TODO: Not just one querie but multiple (three)
         '''Promts the LLM to get queries for a given document'''
         # Define the input text and the prompt for query generation
         prompt = f"Generate three queries based on the following text:\n\n{input_text}\n\nQuery 1:\nQuery 2:\nQuery 3:"
@@ -110,15 +87,11 @@ class Doc2Query:
 
 
 
-
     def test(self):
-        model_id = "mistralai/Mixtral-8x7B-v0.1"
-        tokenizer = AutoTokenizer.from_pretrained(model_id)
+        model = AutoModelForSeq2SeqLM.from_pretrained("google/flan-t5-small")
+        tokenizer = AutoTokenizer.from_pretrained("google/flan-t5-small")
 
-        model = AutoModelForCausalLM.from_pretrained(model_id, load_in_4bit=True)
-
-        text = "Hello my name is"
-        inputs = tokenizer(text, return_tensors="pt").to(0)
-
-        outputs = model.generate(**inputs, max_new_tokens=20)
-        print(tokenizer.decode(outputs[0], skip_special_tokens=True))
+        inputs = tokenizer("A step by step recipe to make bolognese pasta:", return_tensors="pt")
+        outputs = model.generate(**inputs)
+        print(tokenizer.batch_decode(outputs, skip_special_tokens=True))
+        ['Pour a cup of bolognese into a large bowl and add the pasta']
