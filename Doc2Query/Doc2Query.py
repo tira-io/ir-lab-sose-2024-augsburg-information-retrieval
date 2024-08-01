@@ -1,5 +1,5 @@
 import torch
-from transformers import AutoModelForCausalLM, AutoTokenizer
+from transformers import AutoModelForCausalLM, AutoModelForSeq2SeqLM, AutoTokenizer
 import pandas as pd
 import pyterrier as pt
 
@@ -9,13 +9,16 @@ class Doc2Query:
     def __init__(self, model_id, temperatur):
         '''
         Initialize the Doc2Query class and load the tokenizer and the LLM. 
-        Model ids might be "mistralai/Mixtral-8x7B-v0.1" or "meta-llama/Llama-2-7b-chat-hf" or "gpt2
+        Model ids might be "mistralai/Mixtral-8x7B-v0.1" or "meta-llama/Llama-2-7b-chat-hf" or "gpt2" or "google/flan-t5-small"
         
         '''
         self.model_id = model_id
-        #path = "/hpc/gpfs2/scratch/g/coling/models/"+model_id
-        self.tokenizer = AutoTokenizer.from_pretrained(model_id)
-        self.model = AutoModelForCausalLM.from_pretrained(model_id)  # , load_in_4bit=True # Geht das mit Llama auch in 4bit?
+        if model_id == "google/flan-t5-small":
+            self.model = AutoModelForSeq2SeqLM.from_pretrained(model_id)
+            self.tokenizer = AutoTokenizer.from_pretrained(model_id)
+        else: 
+            self.tokenizer = AutoTokenizer.from_pretrained(model_id)
+            self.model = AutoModelForCausalLM.from_pretrained(model_id)  # , load_in_4bit=True 
         self.temperatur = temperatur
 
 
@@ -88,10 +91,15 @@ class Doc2Query:
             # Encode the prompt and generate text
             inputs = self.tokenizer.encode(prompt, return_tensors="pt")
             outputs = self.model.generate(inputs, max_length=100, num_return_sequences=1, do_sample=True, temperature=self.temperatur)
-
             # Decode the generated text
             queries = self.tokenizer.decode(outputs[0], skip_special_tokens=True)
-
+            
+        elif self.model_id == "google/flan-t5-small": 
+            # Encode the prompt and generate text
+            inputs = self.tokenizer(prompt, return_tensors="pt")
+            outputs = self.model.generate(**inputs)
+            # Decode the generated text
+            queries = self.tokenizer.batch_decode(outputs, skip_special_tokens=True)
         else:
             queries = None
             print("Method not specified for this model. Please check model id. Best regards, Georg")
