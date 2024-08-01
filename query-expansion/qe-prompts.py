@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from tira.third_party_integrations import persist_and_normalize_run, ir_datasets
+from tira.third_party_integrations import persist_and_normalize_run, ir_datasets, ensure_pyterrier_is_loaded
 from tira.rest_api_client import Client
 import json
 import torch
@@ -8,6 +8,8 @@ from tqdm import tqdm
 from transformers import AutoModelForSeq2SeqLM, AutoTokenizer
 import pandas as pd
 import click
+import pyterrier as pt
+import re
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
 VALID_PROMPTING_TYPES = {
@@ -23,7 +25,7 @@ def q2d_few_shot_prompt(query, examples):
     prompt = "Write a passage that answers the given query:\n\n"
     for example in examples:
         prompt += f"Query: {example['query_text']}\n"
-        prompt += f"Passage: {example['doc_text']}\n\n"
+        prompt += f"Passage: {example['doc_text'][:1000]}\n\n"
     prompt += f"Query: {query}\nPassage: "
     return prompt
 
@@ -35,7 +37,7 @@ def q2d_zero_shot_prompt(query):
 def q2d_prf_prompt(query, prf_docs):
     prompt = "Write a passage that answers the given query based on the context:\n\nContext: "
     for doc in prf_docs:
-        prompt += f"{doc}\n"
+        prompt += f"{doc[:1000]}\n"
     prompt += f"Query: {query}\nPassage:"
     return prompt
 
@@ -55,7 +57,7 @@ def q2e_zero_shot_prompt(query):
 def q2e_prf_prompt(query, prf_docs):
     prompt = "Write a list of keywords for the given query based on the context:\n\nContext: "
     for doc in prf_docs:
-        prompt += f"{doc}\n"
+        prompt += f"{doc[:1000]}\n"
     prompt += f"Query: {query}\nKeywords:"
     return prompt
 
@@ -66,15 +68,46 @@ def cot_prompt(query):
 def cot_prf_prompt(query, prf_docs):
     prompt = "Answer the following query based on the context:\n\nContext: "
     for doc in prf_docs:
-        prompt += f"{doc}\n"
+        prompt += f"{doc[:1000]}\n"
     prompt += f"Query: {query}\n\nGive the rationale before answering."
     return prompt
 
 
+def retrieve_prf_documents(query, index, docs_store, num_samples=3):
+    bm25 = pt.BatchRetrieve(index, wmodel="BM25")
+    prf = bm25.search(query)
+    # Get the top k docnos
+    top_k_docnos = prf['docno'][:num_samples].tolist()
+
+    ##########TODO: Does docs_store.get(docno).text always return non-empty text?###
+    prf_docs = [docs_store.get(docno).text for docno in top_k_docnos]
+    return process_documents(prf_docs)
+
+def process_documents(docs):
+    """
+    Used for processing documents for prf examples; Getting rid of \n, ABSTRACT, INTRODUCTION, etc.
+    """
+    processed_docs = []
+    for doc in docs:
+        # Replace multiple newline characters with a single space
+        doc = re.sub(r'\n+', ' ', doc)
+        # Remove any periods immediately following "ABSTRACT" or "Abstract"
+        doc = re.sub(r'\b(ABSTRACT|Abstract)\s*\.\s*', r'\1 ', doc)
+        # Insert a space after "ABSTRACT" or "Abstract" if followed by a non-space character
+        doc = re.sub(r'\b(ABSTRACT|Abstract)(\S)', r'\1 \2', doc)
+        # Replace occurrences of 'Abstract' or 'ABSTRACT' with a period between words
+        doc = re.sub(r'\s*(Abstract|ABSTRACT)\s*', r'. ', doc)
+        # Normalize multiple spaces to a single space
+        doc = re.sub(r'\s+', ' ', doc)
+        # Remove "INTRODUCTION" or "Introduction" followed by a non-space character
+        doc = re.sub(r'\b(INTRODUCTION|Introduction)(\S)', r'\2', doc)
+        doc = doc.strip()
+        processed_docs.append(doc)
+    
+    return processed_docs
+
 
 def generate_expansion(query, model, tokenizer, prompting_type, examples, unique_queries, num_samples=3):
-    # generate_expansion(query.default_text(), model, tokenizer, query_doc_dict, unique_queries)
-    # prompting_type = q2d_fs, q2d_zs, q2d_prf, q2e_fs, q2e_zs, q2e_prf, cot, cot_prf
 
     if prompting_type == "q2d_fs":
         # Randomly select num_samples unique query_texts
@@ -104,7 +137,7 @@ def generate_expansion(query, model, tokenizer, prompting_type, examples, unique
         prompt = q2d_zero_shot_prompt(query)
 
     elif prompting_type == "q2d_prf":
-        pass
+        prompt = q2d_prf_prompt(query, examples)
 
     elif prompting_type == "q2e_fs":
         # Convert the dictionary to a list of key-value pairs (tuples)
@@ -117,11 +150,13 @@ def generate_expansion(query, model, tokenizer, prompting_type, examples, unique
         prompt = q2e_zero_shot_prompt(query)
 
     elif prompting_type == "q2e_prf":
-        pass
+        prompt = q2e_prf_prompt(query, examples)
+
     elif prompting_type == "cot":
         prompt = cot_prompt(query)
+
     elif prompting_type == "cot_prf":
-        pass
+        prompt = cot_prf_prompt(query, examples)
     
     # Tokenize the prompt
     inputs = tokenizer(prompt, return_tensors="pt", padding=True).to(device)
@@ -173,6 +208,19 @@ def main(input_dataset, transformer_model, prompting_type, seed, output_dir, loa
     elif prompting_type == "q2e_fs":
         with open('query-expansion/query_keywords_dict.json', 'r') as file:
             examples = json.load(file)
+        unique_queries = None
+    elif prompting_type in ("q2d_prf", "q2e_prf", "cot_prf"):
+        # Create a REST client to the TIRA platform for retrieving the pre-indexed data.
+        #### TODO: Maybe this part is a bit messy because datasets are loaded twice. 
+        #### But I don't know how to get the index from the dataset object
+        #### which I need for bm25 = pt.BatchRetrieve(index, wmodel="BM25")
+        ensure_pyterrier_is_loaded()
+        tira = Client()
+        pt_dataset = pt.get_dataset('irds:ir-lab-sose-2024/ir-acl-anthology-20240504-training')
+        index = tira.pt.index('ir-lab-sose-2024/tira-ir-starter/Index (tira-ir-starter-pyterrier)', pt_dataset)
+        ####
+        docs_store = dataset.docs_store()
+        examples = retrieve_prf_documents(query, index, docs_store)
         unique_queries = None
 
     # Generate expansions
