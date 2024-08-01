@@ -31,10 +31,10 @@ def process_entries(dataset):
             })
     
     # Save the results to a JSON file
-    with open('query-expansion/ms-marco_queries_and_passages.json', 'w') as f:
+    with open('query-expansion/ms-marco_query_doc.json', 'w') as f:
         json.dump(saved_queries_and_passages, f, indent=4)
     
-    print("Results have been saved to 'queries_and_passages.json'.")
+    print("Results have been saved to 'query-expansion/ms-marco_query_doc.json'.")
 
 process_entries(dataset)  # Process the entire dataset
 
