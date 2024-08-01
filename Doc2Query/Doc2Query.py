@@ -22,19 +22,18 @@ class Doc2Query:
         self.temperatur = temperatur
 
 
-    def expandDocumentsByQueries(self, pt_dataset_name):
+    def expandDocumentsByQueries(self, documents_df):
         '''Expands the documents by queries. Return the extended pyterrier dataset.'''
-        pt_dataset = pt.get_dataset(pt_dataset_name)
-        text_df = self.getTextDfFromPtDataset(pt_dataset)
-        # Just for testing
-        #text_df = text_df.head()
-        queries = text_df['text'].apply(self.createQueries)
-        text_df['text'] = text_df.apply(lambda row: f"{row['text']} {queries[row.name]}", axis=1)
-        return text_df
+        # Next line is just for testing
+        documents_df = documents_df.head(50)
+        queries = documents_df['text'].apply(self.createQueries)
+        expaneded_documents_df = documents_df.copy()
+        expaneded_documents_df['text'] = documents_df.apply(lambda row: f"{row['text']} {queries[row.name]}", axis=1)
+        return expaneded_documents_df
         
         
     
-    def getTextDfFromPtDataset(self, pt_dataset): 
+    def getDocumentsDfFromPtDataset(self, pt_dataset): 
         '''Given a pyterrier dataset, the texts and document numbers get extracted into a dataframe, which gets returned'''
          # Get the documents generator
         documents = pt_dataset.get_corpus_iter()
