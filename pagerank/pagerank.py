@@ -43,6 +43,14 @@ class PageRank:
         print("Number of nodes: ", G.number_of_nodes())
         
         return pr
+    
+    def save_pub_dates(pub_dates: dict, filename: str) -> None:
+        """
+        Expects a dictionary with the pub_dates and a filename.
+        Saves the pub_dates as a JSON file.
+        """
+        with open(filename, 'w') as file:
+            json.dump(pub_dates, file)
 
 
 if __name__ == '__main__':
@@ -54,10 +62,14 @@ if __name__ == '__main__':
         papers_info = json.load(file)
 
     reference_matrix = defaultdict(dict)
+    pub_dates = {}
+
     for doc, info in papers_info.items():
         if info is not None:
             for reference in info['references']:
                 reference_matrix[info['paperId']][reference['paperId']] = 1
+            
+            pub_dates[info['paperId']] = info['publicationDate']
 
     # Save the reference matrix
     reference_matrix = PageRank.load_reference_matrix("pagerank/reference_matrix.json")
@@ -74,5 +86,7 @@ if __name__ == '__main__':
 
     pr = PageRank.calculate_pageranks(reference_matrix)
     PageRank.save_pageranks(pr, "pagerank/pageranks.json")
+
+    PageRank.save_pub_dates(pub_dates, "pagerank/pub_dates.json")
 
     print("Successfully calculated the pageranks.")
