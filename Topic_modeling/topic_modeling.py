@@ -2,6 +2,10 @@ import torch
 import torch.nn as nn
 
 import numpy as np
+import pyterrier as pt
+import scipy.sparse as sp
+from nltk.stem import SnowballStemmer
+
 
 class VAE(nn.Module):
     def __init__(self, encoder, decoder, device='cpu'):
@@ -27,7 +31,7 @@ class VAE(nn.Module):
         with torch.no_grad():
             mean, log_var = self.encoder(x)
             z = self.reparameterization(mean, torch.exp(0.5 * log_var))
-            theta = torch.softmax(z,dim=1)
+            theta = torch.softmax(z,dim=0)
             return theta.detach().cpu().squeeze(0).numpy()
 
 
@@ -90,17 +94,61 @@ class SparseDataset():
         obs[self.indices[ind1:ind2]] = self.data[ind1:ind2]
         return obs
     
-def topic_cos_sim(keyFreq, posting, entryStats, collStats, vae):
+def topic_cos_sim(doc, index, vae):
     print("hi")
-    print(posting.getId())
-    print(keyFreq)
-    print("hi2")
-    query_bow = []
-    doc_bow = []
+    print(doc)
+
+    di = index.getDirectIndex()
+    doi = index.getDocumentIndex()
+    lex = index.getLexicon()
+    meta = index.getMetaIndex()
+
+    bow_sparse_q = sp.csr_array(len(lex), dtype=np.int8)
+    bow_sparse_d = sp.csr_array(len(lex), dtype=np.int8)
+
+    qid = doc["qid"]
+    query = doc["query"].split(" ")
+    stemmer = SnowballStemmer(language="english")
+
+    freqs = {}
+
+    for term in query:
+        term = stemmer.stem(term)
+        lee = lex.getLexiconEntry(term)
+        termid = lee.getTermId()
+        if not termid in freqs:
+            freqs[termid] = 1
+        else:
+            freqs[termid] += 1
+    print(query)    
+    print(freqs)
+
+    for term in query:
+        lee = lex.getLexiconEntry(term)
+        termid = lee.getTermId()
+        if freqs[termid] > 0:
+            bow_sparse_q[termid] = freqs[termid]
+    
+    print(bow_sparse_q)    
+
+    docid = doc["docid"]
+    for posting in  di.getPostings(doi.getDocumentEntry(docid)):
+        if posting.getFrequency() > 0:
+            termid = posting.getId()
+            lee = lex.getLexiconEntry(termid)
+            bow_sparse_d[termid] = posting.getFrequency()
+
+    #bow_sparse_q = bow_sparse_q.tocsr()
+    #bow_sparse_d = bow_sparse_d.tocsr()
+    
+    print(bow_sparse_q)
+    print(bow_sparse_d)
+
+
     vae.eval()
 
     with torch.no_grad():
-        q_theta = vae.inference_theta(query_bow)
-        doc_theta = vae.inference_theta(doc_bow)
+        q_theta = vae.inference_theta(bow_sparse_q.todense())
+        doc_theta = vae.inference_theta(bow_sparse_d.todense())
     
     return np.dot(q_theta, doc_theta) / (np.norm(q_theta) * np.norm(doc_theta))
