@@ -28,8 +28,9 @@ class VAE(nn.Module):
         return x_hat, mean, log_var
     
     def inference_theta(self, x):
+        enc = Encoder(input_dim=97223, hidden_dim=16384, latent_dim=128)
         with torch.no_grad():
-            mean, log_var = self.encoder(x)
+            mean, log_var = enc(x)
             z = self.reparameterization(mean, torch.exp(0.5 * log_var))
             theta = torch.softmax(z,dim=0)
             return theta.detach().cpu().squeeze(0).numpy()
@@ -95,16 +96,14 @@ class SparseDataset():
         return obs
     
 def topic_cos_sim(doc, index, vae):
-    print("hi")
-    print(doc)
 
     di = index.getDirectIndex()
     doi = index.getDocumentIndex()
     lex = index.getLexicon()
     meta = index.getMetaIndex()
 
-    bow_sparse_q = sp.csr_array(len(lex), dtype=np.int8)
-    bow_sparse_d = sp.csr_array(len(lex), dtype=np.int8)
+    bow_sparse_q = sp.dok_matrix((1, len(lex)), dtype=np.int8)
+    bow_sparse_d = sp.dok_matrix((1, len(lex)), dtype=np.int8)
 
     qid = doc["qid"]
     query = doc["query"].split(" ")
@@ -120,35 +119,29 @@ def topic_cos_sim(doc, index, vae):
             freqs[termid] = 1
         else:
             freqs[termid] += 1
-    print(query)    
-    print(freqs)
 
     for term in query:
+        term = stemmer.stem(term)
         lee = lex.getLexiconEntry(term)
         termid = lee.getTermId()
         if freqs[termid] > 0:
-            bow_sparse_q[termid] = freqs[termid]
-    
-    print(bow_sparse_q)    
+            bow_sparse_q[0, termid] = freqs[termid]
+   
 
     docid = doc["docid"]
     for posting in  di.getPostings(doi.getDocumentEntry(docid)):
         if posting.getFrequency() > 0:
             termid = posting.getId()
             lee = lex.getLexiconEntry(termid)
-            bow_sparse_d[termid] = posting.getFrequency()
+            bow_sparse_d[0, termid] = posting.getFrequency()
 
-    #bow_sparse_q = bow_sparse_q.tocsr()
-    #bow_sparse_d = bow_sparse_d.tocsr()
-    
-    print(bow_sparse_q)
-    print(bow_sparse_d)
-
+    bow_sparse_q = bow_sparse_q.tocsr()
+    bow_sparse_d = bow_sparse_d.tocsr()
 
     vae.eval()
 
     with torch.no_grad():
-        q_theta = vae.inference_theta(bow_sparse_q.todense())
-        doc_theta = vae.inference_theta(bow_sparse_d.todense())
+        q_theta = vae.inference_theta(torch.tensor(bow_sparse_q.todense(), dtype=torch.float32))
+        doc_theta = vae.inference_theta(torch.tensor(bow_sparse_d.todense(), dtype=torch.float32))
     
     return np.dot(q_theta, doc_theta) / (np.norm(q_theta) * np.norm(doc_theta))
