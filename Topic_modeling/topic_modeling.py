@@ -144,4 +144,4 @@ def topic_cos_sim(doc, index, vae):
         q_theta = vae.inference_theta(torch.tensor(bow_sparse_q.todense(), dtype=torch.float32))
         doc_theta = vae.inference_theta(torch.tensor(bow_sparse_d.todense(), dtype=torch.float32))
     
-    return np.dot(q_theta, doc_theta) / (np.norm(q_theta) * np.norm(doc_theta))
+    return np.dot(q_theta, doc_theta) / (np.linalg.norm(q_theta) * np.linalg.norm(doc_theta))
