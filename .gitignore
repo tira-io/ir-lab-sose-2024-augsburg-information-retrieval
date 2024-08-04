@@ -1,4 +1,6 @@
 .tira
+Doc2Query/index_Doc2QueryT5/
+indexes/
 data
 pagerank/fake_input*
 pagerank/test_input.json
