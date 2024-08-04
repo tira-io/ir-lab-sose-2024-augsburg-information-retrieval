@@ -12,6 +12,7 @@ class Doc2Query:
         Model ids might be "mistralai/Mixtral-8x7B-v0.1" or "meta-llama/Llama-2-7b-chat-hf" or "gpt2" or "google/flan-t5-small"
         
         '''
+        # if you are working on Licca you have to add the path to the model
         self.model_id = model_id
         if model_id == "google/flan-t5-small":
             self.model = AutoModelForSeq2SeqLM.from_pretrained(model_id)
