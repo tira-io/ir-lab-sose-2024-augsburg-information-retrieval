@@ -75,8 +75,6 @@ def retrieve_prf_documents(query, index, docs_store, num_samples=3):
     prf = bm25.search(query.replace('?', ''))
     # Get the top k docnos
     top_k_docnos = prf['docno'][:num_samples].tolist()
-
-    ##########TODO: Does docs_store.get(docno).text always return non-empty text?###
     prf_docs = [docs_store.get(docno).text for docno in top_k_docnos]
     return process_documents(prf_docs)
 
