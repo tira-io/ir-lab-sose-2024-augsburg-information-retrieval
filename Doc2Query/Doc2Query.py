@@ -88,6 +88,8 @@ class Doc2Query:
     def getPrompt(self, input_text): 
         if self.promting_technique == "Zero-Shot": 
             prompt = self.getZeroShotPrompt(input_text)
+        elif self.promting_technique == "Contextualized-Zero-Shot": 
+            prompt = self.getContextualizedZeroShotPrompt(input_text)
         elif self.promting_technique == "One-Shot": 
             prompt = self.getOneShotPrompt(input_text)
         elif self.promting_technique == "Few-Shot": 
@@ -99,6 +101,11 @@ class Doc2Query:
 
     def getZeroShotPrompt(self, input_text): 
         prompt = f"Generate three queries based on the following text:\n\n{input_text}\n\nQuery 1:\nQuery 2:\nQuery 3:"
+        return prompt
+
+    def getContextualizedZeroShotPrompt(self, input_text): 
+        prompt = f"You are an experienced teacher at a university, giving a course on information retrieval. You will discuss a paper with your students, please generate \
+            three realistic queries that students could ask about the following paper:\n\n{input_text}\n\nThe three queries are:"
         return prompt
     
     def getOneShotPrompt(self, input_text): 
